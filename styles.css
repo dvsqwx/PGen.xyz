@@ -1,4 +1,6 @@
 :root{
+  --radius: 0px;
+}
   --bg: #0b0b0b;
   --panel: #111111;
   --panel2: #0f0f0f;
