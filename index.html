@@ -3,25 +3,58 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PGen.xyz — генеруй пароль, перевiряй свiй</title>
+  <title>PGen.xyz — Генератор і перевірка паролів</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="headerText">
-        <h1>PGen</h1>
-        <p>Генератор паролів + перевірка надійності.</p>
+  <header class="topbar">
+    <div class="brand">PGen.xyz</div>
+    <nav class="nav">
+      <a class="navLink" href="#home">Головна</a>
+      <a class="navLink" href="#app">Проєкт</a>
+      <a class="navLink" href="#about">Про проєкт</a>
+    </nav>
+    <a class="cta" href="#app">Відкрити застосунок</a>
+  </header>
+  <section id="home" class="hero">
+    <canvas id="hero3d" class="heroCanvas" aria-hidden="true"></canvas>
+    <div class="heroInner">
+      <div class="heroKicker">Password Tools · Offline · Local</div>
+      <h1 class="heroTitle">PGen.xyz</h1>
+      <p class="heroText">
+        Генератор паролів та перевірка надійності в одному застосунку.
+        Працює локально. Історія збережень — у браузері.
+      </p>
+      <div class="heroButtons">
+        <a class="btnPrimary" href="#app">Перейти до проєкту</a>
+        <button id="toggle3dBtn" class="btnSecondary" type="button">3D: увімкнено</button>
       </div>
-      <div class="pill">JS · localStorage · clipboard</div>
-    </header>
+      <div class="scrollHint">
+        <span>Прокрути вниз</span>
+        <div class="scrollLine"></div>
+      </div>
+    </div>
+    <div class="heroGlow" aria-hidden="true"></div>
+  </section>
+  <section id="app" class="appSection">
+    <div class="appHeader">
+      <div>
+        <h2 class="sectionTitle">Застосунок</h2>
+        <p class="sectionText">Згенеруй пароль, перевір силу, отримай підказки, збережи в історію.</p>
+      </div>
+      <div class="chipRow">
+        <div class="chip">JS</div>
+        <div class="chip">localStorage</div>
+        <div class="chip">clipboard</div>
+      </div>
+    </div>
     <main class="grid">
       <section class="card">
         <div class="cardBody">
-          <h2>1) Генератор пароля</h2>
+          <h3 class="cardTitle">1) Генератор пароля</h3>
           <div class="row">
             <label class="label">
               Довжина:
@@ -35,30 +68,30 @@
             <label class="label"><input id="symbolsCheckbox" type="checkbox" /> спецсимволи (!@#…)</label>
           </div>
           <div class="buttons">
-            <button id="generateBtn">Згенерувати</button>
-            <button id="clearBtn" class="btnSecondary">Очистити</button>
+            <button id="generateBtn" class="btn">Згенерувати</button>
+            <button id="clearBtn" class="btn btnGhost">Очистити</button>
           </div>
           <div class="divider"></div>
           <input id="passwordInput" type="text" placeholder="Введи пароль або згенеруй" />
           <div class="buttons">
-            <button id="copyBtn">Копіювати</button>
-            <button id="saveBtn" class="btnGhost">Зберегти в історію</button>
+            <button id="copyBtn" class="btn">Копіювати</button>
+            <button id="saveBtn" class="btn btnGhost">Зберегти в історію</button>
           </div>
           <div id="message" class="hint"></div>
           <div class="history">
             <div class="historyHeader">
               <div><b>Історія (до 10)</b></div>
-              <button id="clearHistoryBtn" class="btnGhost">Очистити</button>
+              <button id="clearHistoryBtn" class="btn btnGhost" type="button">Очистити</button>
             </div>
             <div id="historyList"></div>
           </div>
         </div>
       </section>
-      <section class="card">
+      <section class="card cardWide">
         <div class="cardBody">
-          <h2>2) Перевірка надійності</h2>
+          <h3 class="cardTitle">2) Перевірка надійності</h3>
           <div class="row between">
-            <div class="row" style="gap:8px;">
+            <div class="row" style="gap:10px;">
               <span class="smallText">Сила:</span>
               <span id="strengthLabel" class="badge">—</span>
             </div>
@@ -68,15 +101,15 @@
             <div id="progressBar" class="progressBar"></div>
           </div>
           <div id="checks" class="checks"></div>
-          <h2 class="sectionTitle">Поради</h2>
+          <h3 class="cardTitle" style="margin-top:18px;">Поради</h3>
           <ul id="tips"></ul>
-          <div class="footerNote">
+          <div id="about" class="footerNote">
           </div>
         </div>
       </section>
     </main>
-  </div>
-
+  </section>
   <script src="app.js"></script>
+  <script type="module" src="ui.js"></script>
 </body>
 </html>
