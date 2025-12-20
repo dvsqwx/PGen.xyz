@@ -4,13 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PGen.xyz — Password Tools</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
-  
 <body>
   <header class="topbar">
     <div class="topLeft">
@@ -31,44 +29,48 @@
 
       <div class="panel leftPanel">
         <div class="leftInner">
+          <div class="heroKicker">
+            <span class="kDot"></span>
+            OFFLINE PASSWORD TOOLKIT
+          </div>
           <h1 class="headline">
-            SEE THE<br>
-            UNSE<span class="lime">E</span>N
+            GENERATE.<br>
+            CHECK.<br>
+            <span class="lime">SECURE.</span>
           </h1>
           <div class="leftMeta">
-            <div class="metaTitle">UNCOVERING</div>
+            <div class="metaTitle">WHAT IT DOES</div>
             <p class="metaText">
-              Generate passwords, check strength, get tips, and save local history.
-              Everything runs in your browser.
+              Build passwords with custom length and character sets, analyze strength,
+              get tips, copy to clipboard, and keep a small local history.
             </p>
           </div>
           <div class="leftIcons">
-            <div class="miniIcon" title="Scroll">
+            <div class="miniIcon" title="Scroll down">
               <span class="chev"></span>
               <span class="chev"></span>
             </div>
-            <div class="miniArrow" title="Go to App"></div>
+            <a class="miniArrow" href="#app" title="Go to App"></a>
           </div>
         </div>
       </div>
 
       <div class="panel rightPanel">
         <div class="ringStage">
+
           <svg class="ringText" viewBox="0 0 500 500" aria-hidden="true">
             <defs>
               <path id="circlePath" d="M250,250 m-190,0 a190,190 0 1,1 380,0 a190,190 0 1,1 -380,0"/>
             </defs>
             <text>
               <textPath href="#circlePath" startOffset="0%">
-                LET’S MAKE MAGIC • LET’S MAKE MAGIC • LET’S MAKE MAGIC •
+                PGEN.XYZ • PASSWORD GENERATOR • STRENGTH CHECKER • LOCAL HISTORY •
               </textPath>
             </text>
           </svg>
           <div class="ringRing"></div>
-
           <div class="orbit orbitA"></div>
           <div class="orbit orbitB"></div>
-
           <canvas id="crystal3d" class="crystalCanvas" aria-hidden="true"></canvas>
 
           <div class="dot d1"></div>
@@ -76,16 +78,18 @@
           <div class="dot d3"></div>
           <div class="dot d4"></div>
           <div class="dot d5"></div>
+          <div class="rightLabel">
+            <div class="rightTitle">3D MODULE</div>
+            <div class="rightSub">Tetra wireframe + edges</div>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="marquee">
       <div class="marqueeTrack">
-        ADS MANAGEMENT&nbsp;&nbsp;+&nbsp;&nbsp;SOCIAL&nbsp;&nbsp;+&nbsp;&nbsp;TECH&nbsp;&nbsp;+&nbsp;&nbsp;STRATEGY&nbsp;&nbsp;+&nbsp;&nbsp;
-        PASSWORD GENERATOR&nbsp;&nbsp;+&nbsp;&nbsp;STRENGTH CHECKER&nbsp;&nbsp;+&nbsp;&nbsp;LOCAL HISTORY&nbsp;&nbsp;+&nbsp;&nbsp;CLIPBOARD&nbsp;&nbsp;+&nbsp;&nbsp;
-        ADS MANAGEMENT&nbsp;&nbsp;+&nbsp;&nbsp;SOCIAL&nbsp;&nbsp;+&nbsp;&nbsp;TECH&nbsp;&nbsp;+&nbsp;&nbsp;STRATEGY&nbsp;&nbsp;+&nbsp;&nbsp;
-        PASSWORD GENERATOR&nbsp;&nbsp;+&nbsp;&nbsp;STRENGTH CHECKER&nbsp;&nbsp;+&nbsp;&nbsp;LOCAL HISTORY&nbsp;&nbsp;+&nbsp;&nbsp;CLIPBOARD&nbsp;&nbsp;+&nbsp;&nbsp;
+        PGEN.XYZ&nbsp;&nbsp;+&nbsp;&nbsp;PASSWORD GENERATOR&nbsp;&nbsp;+&nbsp;&nbsp;STRENGTH CHECKER&nbsp;&nbsp;+&nbsp;&nbsp;CLIPBOARD&nbsp;&nbsp;+&nbsp;&nbsp;LOCAL HISTORY&nbsp;&nbsp;+&nbsp;&nbsp;
+        PGEN.XYZ&nbsp;&nbsp;+&nbsp;&nbsp;PASSWORD GENERATOR&nbsp;&nbsp;+&nbsp;&nbsp;STRENGTH CHECKER&nbsp;&nbsp;+&nbsp;&nbsp;CLIPBOARD&nbsp;&nbsp;+&nbsp;&nbsp;LOCAL HISTORY&nbsp;&nbsp;+&nbsp;&nbsp;
       </div>
     </div>
   </section>
@@ -102,9 +106,8 @@
         <div class="chip">Clipboard API</div>
       </div>
     </div>
-    
     <main class="grid">
-
+      <!-- Generator -->
       <section class="card">
         <div class="cardBody">
           <h3 class="cardTitle">1) Password Generator</h3>
