@@ -1,8 +1,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
-const canvas = document.getElementById("hero3d");
 const appSection = document.getElementById("app");
-const themeToggle = document.getElementById("themeToggle");
+const canvas = document.getElementById("crystal3d");
+
 document.querySelectorAll('a[href^="#"]').forEach((a) => {
   a.addEventListener("click", (ev) => {
     const id = a.getAttribute("href");
@@ -13,130 +13,122 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
   });
 });
 
-
 const io = new IntersectionObserver((entries) => {
   for (const e of entries) {
-    if (e.isIntersecting) appSection.classList.add("isVisible");
+    if (e.isIntersecting) appSection?.classList.add("isVisible");
   }
 }, { threshold: 0.18 });
 if (appSection) io.observe(appSection);
-
-
-const THEME_KEY = "pgen_theme_v1";
-function applyTheme(theme) {
-  document.body.setAttribute("data-theme", theme);
-  if (themeToggle) themeToggle.textContent = theme === "light" ? "Theme: Light" : "Theme: Dark";
-}
-const savedTheme = localStorage.getItem(THEME_KEY);
-applyTheme(savedTheme === "light" ? "light" : "dark");
-themeToggle?.addEventListener("click", () => {
-  const current = document.body.getAttribute("data-theme") || "dark";
-  const next = current === "dark" ? "light" : "dark";
-  localStorage.setItem(THEME_KEY, next);
-  applyTheme(next);
-});
-
 
 if (canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-  camera.position.set(0, 0.25, 6);
-  const group = new THREE.Group();
-  scene.add(group);
+  camera.position.set(0, 0.18, 5.0);
 
-
-  const key = new THREE.DirectionalLight(0xffffff, 1.15);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.32));
+  const key = new THREE.DirectionalLight(0xffffff, 1.25);
   key.position.set(3, 3, 3);
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0x9aa7ff, 0.55);
+  const fill = new THREE.DirectionalLight(0xcfd6ff, 0.35);
   fill.position.set(-4, 2, -2);
   scene.add(fill);
-  const rimCyan = new THREE.PointLight(0x21d4ff, 1.15, 30);
-  rimCyan.position.set(0, 1.4, 4);
-  scene.add(rimCyan);
-  const rimRed = new THREE.PointLight(0xff3d6a, 0.75, 30);
-  rimRed.position.set(-2.2, -0.6, 3.0);
-  scene.add(rimRed);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.30));
+  const rim = new THREE.PointLight(0xffffff, 0.65, 30);
+  rim.position.set(0, 1.2, 3.6);
+  scene.add(rim);
+  const limeRim = new THREE.PointLight(0xb9ff2a, 0.35, 30);
+  limeRim.position.set(-2.4, 0.4, 2.8);
+  scene.add(limeRim);
+  const group = new THREE.Group();
+  scene.add(group);
+  const logo = new THREE.Group();
+  group.add(logo);
 
+  const tetraGeo = new THREE.TetrahedronGeometry(1.15, 0);
 
-  const crystal = new THREE.Group();
-  group.add(crystal);
-  const geo = new THREE.OctahedronGeometry(1.25, 0);
-  const glassMat = new THREE.MeshPhysicalMaterial({
-    color: 0x0a0f18,
-    metalness: 0.35,
-    roughness: 0.15,
-    transmission: 0.6,
-    thickness: 0.6,
-    ior: 1.4,
+  const faceMat = new THREE.MeshPhysicalMaterial({
+    color: 0x0b0b0b,
+    metalness: 0.20,
+    roughness: 0.20,
+    transmission: 0.45,
+    thickness: 0.9,
+    ior: 1.45,
+    transparent: true,
+    opacity: 0.86,
     clearcoat: 1.0,
-    clearcoatRoughness: 0.12
+    clearcoatRoughness: 0.10
   });
+  const faces = new THREE.Mesh(tetraGeo, faceMat);
+  logo.add(faces);
 
-  const core = new THREE.Mesh(geo, glassMat);
-  crystal.add(core);
-  const wire = new THREE.Mesh(
-    geo,
-    new THREE.MeshBasicMaterial({
-      color: 0x21d4ff,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.55
-    })
-  );
-  wire.scale.setScalar(1.015);
-  crystal.add(wire);
-  const edges = new THREE.EdgesGeometry(geo);
-  const edgeLines = new THREE.LineSegments(
-    edges,
+  const wire = new THREE.LineSegments(
+    new THREE.WireframeGeometry(tetraGeo),
     new THREE.LineBasicMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.72
+      opacity: 0.36
     })
   );
-  edgeLines.scale.setScalar(1.02);
-  crystal.add(edgeLines);
-  const inner = new THREE.Mesh(
-    new THREE.OctahedronGeometry(0.62, 0),
-    new THREE.MeshStandardMaterial({
-      color: 0x7c5cff,
-      metalness: 0.2,
-      roughness: 0.25,
-      emissive: 0x140a2a,
-      emissiveIntensity: 1.0
+  wire.scale.setScalar(1.01);
+  logo.add(wire);
+
+  const edges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(tetraGeo),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.86
     })
   );
-  inner.rotation.set(0.6, 0.2, 0.1);
-  crystal.add(inner);
+  edges.scale.setScalar(1.02);
+  logo.add(edges);
 
+  const limeEdges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(tetraGeo),
+    new THREE.LineBasicMaterial({
+      color: 0xb9ff2a,
+      transparent: true,
+      opacity: 0.30
+    })
+  );
+  limeEdges.scale.setScalar(1.025);
+  limeEdges.rotation.set(0.05, 0.10, 0);
+  logo.add(limeEdges);
 
-  const shardGeo = new THREE.OctahedronGeometry(0.18, 0);
-  for (let i = 0; i < 10; i++) {
-    const shard = new THREE.Mesh(
-      shardGeo,
-      new THREE.MeshStandardMaterial({
-        color: 0xdfe7ff,
-        metalness: 0.55,
-        roughness: 0.3
-      })
-    );
-    shard.position.set(
-      (Math.random() - 0.5) * 3.4,
-      (Math.random() - 0.5) * 1.8,
-      (Math.random() - 0.5) * 1.8
-    );
-    shard.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-    shard.userData.spin = {
-      x: (Math.random() - 0.5) * 0.02,
-      y: (Math.random() - 0.5) * 0.02,
-      z: (Math.random() - 0.5) * 0.02
-    };
-    crystal.add(shard);
-  }
+  const inner = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.TetrahedronGeometry(0.74, 0)),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.45
+    })
+  );
+  inner.rotation.set(0.25, 0.55, 0.12);
+  logo.add(inner);
+
+  const dots = new THREE.Group();
+  logo.add(dots);
+  const dotGeo = new THREE.SphereGeometry(0.045, 16, 16);
+  const dotMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    metalness: 0.08,
+    roughness: 0.45
+  });
+  const dotPositions = [
+    [ 0.95,  0.25,  0.20],
+    [-0.90, -0.05,  0.35],
+    [ 0.10, -0.85,  0.10],
+    [-0.25,  0.75, -0.10],
+    [ 0.55, -0.10, -0.70],
+    [-0.55,  0.10, -0.70],
+  ];
+  dotPositions.forEach((p, i) => {
+    const d = new THREE.Mesh(dotGeo, dotMat);
+    d.position.set(p[0], p[1], p[2]);
+    d.userData.floatSeed = i * 0.7;
+    dots.add(d);
+  });
   function resize() {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
@@ -148,7 +140,6 @@ if (canvas) {
   window.addEventListener("resize", resize);
   resize();
 
-
   let mx = 0, my = 0;
   window.addEventListener("mousemove", (e) => {
     mx = (e.clientX / window.innerWidth) * 2 - 1;
@@ -158,23 +149,21 @@ if (canvas) {
   function animate() {
     requestAnimationFrame(animate);
     t += 0.01;
-    group.rotation.y = t * 0.18;
-    group.rotation.x = Math.sin(t * 0.55) * 0.10;
-    group.rotation.z = Math.cos(t * 0.40) * 0.08;
-    
-    crystal.rotation.y += 0.008;
-    crystal.rotation.x += 0.006;
-    crystal.children.forEach((obj) => {
-      if (obj.userData?.spin) {
-        obj.rotation.x += obj.userData.spin.x;
-        obj.rotation.y += obj.userData.spin.y;
-        obj.rotation.z += obj.userData.spin.z;
-      }
+
+    group.rotation.y = t * 0.20;
+    group.rotation.x = Math.sin(t * 0.55) * 0.08;
+    group.rotation.z = Math.cos(t * 0.45) * 0.06;
+
+    logo.rotation.y += 0.012;
+    logo.rotation.x += 0.008;
+
+    dots.children.forEach((d) => {
+      const s = d.userData.floatSeed || 0;
+      d.position.y += Math.sin(t + s) * 0.0008;
     });
 
-    camera.position.x = mx * 0.35;
-    camera.position.y = 0.25 + (-my * 0.22);
-
+    camera.position.x = mx * 0.22;
+    camera.position.y = 0.18 + (-my * 0.16);
     renderer.render(scene, camera);
   }
   animate();
