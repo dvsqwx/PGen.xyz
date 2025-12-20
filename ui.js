@@ -2,14 +2,12 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const canvas = document.getElementById("hero3d");
 const appSection = document.getElementById("app");
-const toggleBtn = document.getElementById("toggle3dBtn");
-let enabled = true;
-const io = new IntersectionObserver((entries) => {
-  for (const e of entries) {
-    if (e.isIntersecting) appSection.classList.add("isVisible");
-  }
-}, { threshold: 0.18 });
-io.observe(appSection);
+const toggle3dBtn = document.getElementById("toggle3dBtn");
+const themeToggle = document.getElementById("themeToggle");
+
+let enabled3d = true;
+
+
 document.querySelectorAll('a[href^="#"]').forEach((a) => {
   a.addEventListener("click", (ev) => {
     const id = a.getAttribute("href");
@@ -20,95 +18,185 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
   });
 });
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-camera.position.set(0, 0.3, 6);
-const group = new THREE.Group();
-scene.add(group);
-const key = new THREE.DirectionalLight(0xffffff, 1.2);
-key.position.set(3, 3, 3);
-scene.add(key);
-const fill = new THREE.DirectionalLight(0x88aaff, 0.6);
-fill.position.set(-4, 2, -2);
-scene.add(fill);
-const rim = new THREE.PointLight(0x22d4ff, 1.1, 30);
-rim.position.set(0, 1.6, 4);
-scene.add(rim);
-scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-const metal = new THREE.MeshStandardMaterial({
-  color: 0xdfe7ff,
-  metalness: 0.9,
-  roughness: 0.25
-});
 
-const neon = new THREE.MeshStandardMaterial({
-  color: 0x21d4ff,
-  metalness: 0.2,
-  roughness: 0.15,
-  emissive: 0x0b2230,
-  emissiveIntensity: 1.0
-});
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) appSection.classList.add("isVisible");
+  }
+}, { threshold: 0.18 });
+if (appSection) io.observe(appSection);
 
-const knot1 = new THREE.Mesh(
-  new THREE.TorusKnotGeometry(0.9, 0.26, 220, 24),
-  metal
-);
-knot1.position.set(1.25, 0.1, 0.0);
-group.add(knot1);
-const knot2 = new THREE.Mesh(
-  new THREE.TorusKnotGeometry(0.65, 0.20, 220, 18),
-  neon
-);
-knot2.position.set(-1.35, -0.2, -0.2);
-group.add(knot2);
-const ringGeo = new THREE.TorusGeometry(1.05, 0.09, 18, 120);
-for (let i = 0; i < 3; i++) {
-  const ring = new THREE.Mesh(ringGeo, metal.clone());
-  ring.position.set(0.0, 0.6 - i * 0.55, -0.8 - i * 0.25);
-  ring.rotation.set(0.6 + i * 0.2, 0.3 + i * 0.35, 0.2);
-  ring.material.roughness = 0.18 + i * 0.08;
-  group.add(ring);
+
+const THEME_KEY = "pgen_theme_v1";
+function applyTheme(theme) {
+  document.body.setAttribute("data-theme", theme);
+  if (themeToggle) themeToggle.textContent = theme === "light" ? "Тема: світла" : "Тема: темна";
 }
-
-function resize() {
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight;
-  if (!w || !h) return;
-
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-}
-window.addEventListener("resize", resize);
-resize();
-
-let mx = 0, my = 0;
-window.addEventListener("mousemove", (e) => {
-  const x = (e.clientX / window.innerWidth) * 2 - 1;
-  const y = (e.clientY / window.innerHeight) * 2 - 1;
-  mx = x; my = y;
+const savedTheme = localStorage.getItem(THEME_KEY);
+applyTheme(savedTheme === "light" ? "light" : "dark");
+themeToggle?.addEventListener("click", () => {
+  const current = document.body.getAttribute("data-theme") || "dark";
+  const next = current === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
 });
-let t = 0;
-function animate() {
-  requestAnimationFrame(animate);
-  if (!enabled) return;
-  t += 0.01;
-  group.rotation.y = t * 0.35;
-  group.rotation.x = Math.sin(t * 0.6) * 0.12;
-  group.rotation.z = Math.cos(t * 0.45) * 0.08;
-  knot1.rotation.x += 0.006;
-  knot1.rotation.y += 0.008;
-  knot2.rotation.x -= 0.007;
-  knot2.rotation.z += 0.006;
-  camera.position.x = mx * 0.35;
-  camera.position.y = 0.3 + (-my * 0.22);
-  renderer.render(scene, camera);
+
+
+if (!canvas) {
+  // no canvas -> just exit gracefully
+  console.warn("hero3d canvas not found");
+} else {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0.25, 6);
+  const group = new THREE.Group();
+  scene.add(group);
+
+
+  const key = new THREE.DirectionalLight(0xffffff, 1.2);
+  key.position.set(3, 3, 3);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0x88aaff, 0.55);
+  fill.position.set(-4, 2, -2);
+  scene.add(fill);
+  const rim = new THREE.PointLight(0x21d4ff, 1.1, 30);
+  rim.position.set(0, 1.6, 4);
+  scene.add(rim);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.32));
+
+
+  const crystal = new THREE.Group();
+  group.add(crystal);
+  const crystalGeo = new THREE.OctahedronGeometry(1.25, 0);
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0x0a0f18,
+    metalness: 0.35,
+    roughness: 0.15,
+    transmission: 0.6,
+    thickness: 0.6,
+    ior: 1.4,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.12
+  });
+  const core = new THREE.Mesh(crystalGeo, glassMat);
+  crystal.add(core);
+  const wire = new THREE.Mesh(
+    crystalGeo,
+    new THREE.MeshBasicMaterial({
+      color: 0x21d4ff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.55
+    })
+  );
+  wire.scale.setScalar(1.015);
+  crystal.add(wire);
+  const edges = new THREE.EdgesGeometry(crystalGeo);
+  const edgeLines = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.75
+    })
+  );
+  edgeLines.scale.setScalar(1.02);
+  crystal.add(edgeLines);
+  const inner = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.62, 0),
+    new THREE.MeshStandardMaterial({
+      color: 0x7c5cff,
+      metalness: 0.2,
+      roughness: 0.25,
+      emissive: 0x160b2a,
+      emissiveIntensity: 1.1
+    })
+  );
+  inner.rotation.set(0.6, 0.2, 0.1);
+  crystal.add(inner);
+
+
+  const shardGeo = new THREE.OctahedronGeometry(0.18, 0);
+  for (let i = 0; i < 10; i++) {
+    const shard = new THREE.Mesh(
+      shardGeo,
+      new THREE.MeshStandardMaterial({
+        color: 0xdfe7ff,
+        metalness: 0.55,
+        roughness: 0.3
+      })
+    );
+    shard.position.set(
+      (Math.random() - 0.5) * 3.4,
+      (Math.random() - 0.5) * 1.8,
+      (Math.random() - 0.5) * 1.8
+    );
+    shard.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    shard.userData.spin = {
+      x: (Math.random() - 0.5) * 0.02,
+      y: (Math.random() - 0.5) * 0.02,
+      z: (Math.random() - 0.5) * 0.02
+    };
+    crystal.add(shard);
+  }
+
+
+  function resize() {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+
+  let mx = 0, my = 0;
+  window.addEventListener("mousemove", (e) => {
+    mx = (e.clientX / window.innerWidth) * 2 - 1;
+    my = (e.clientY / window.innerHeight) * 2 - 1;
+  });
+
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!enabled3d) return;
+
+    t += 0.01;
+
+
+    group.rotation.y = t * 0.18;
+    group.rotation.x = Math.sin(t * 0.55) * 0.10;
+    group.rotation.z = Math.cos(t * 0.40) * 0.08;
+
+
+    crystal.rotation.y += 0.008;
+    crystal.rotation.x += 0.006;
+
+
+    crystal.children.forEach((obj) => {
+      if (obj.userData?.spin) {
+        obj.rotation.x += obj.userData.spin.x;
+        obj.rotation.y += obj.userData.spin.y;
+        obj.rotation.z += obj.userData.spin.z;
+      }
+    });
+
+
+    camera.position.x = mx * 0.35;
+    camera.position.y = 0.25 + (-my * 0.22);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+  toggle3dBtn?.addEventListener("click", () => {
+    enabled3d = !enabled3d;
+    toggle3dBtn.textContent = enabled3d ? "3D: увімкнено" : "3D: вимкнено";
+    if (enabled3d) renderer.render(scene, camera);
+  });
 }
-animate();
-toggleBtn?.addEventListener("click", () => {
-  enabled = !enabled;
-  toggleBtn.textContent = enabled ? "3D: увімкнено" : "3D: вимкнено";
-  if (enabled) renderer.render(scene, camera);
-});
