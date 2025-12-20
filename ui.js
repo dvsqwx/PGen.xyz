@@ -2,12 +2,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const canvas = document.getElementById("hero3d");
 const appSection = document.getElementById("app");
-const toggle3dBtn = document.getElementById("toggle3dBtn");
 const themeToggle = document.getElementById("themeToggle");
-
-let enabled3d = true;
-
-
 document.querySelectorAll('a[href^="#"]').forEach((a) => {
   a.addEventListener("click", (ev) => {
     const id = a.getAttribute("href");
@@ -30,7 +25,7 @@ if (appSection) io.observe(appSection);
 const THEME_KEY = "pgen_theme_v1";
 function applyTheme(theme) {
   document.body.setAttribute("data-theme", theme);
-  if (themeToggle) themeToggle.textContent = theme === "light" ? "Тема: світла" : "Тема: темна";
+  if (themeToggle) themeToggle.textContent = theme === "light" ? "Theme: Light" : "Theme: Dark";
 }
 const savedTheme = localStorage.getItem(THEME_KEY);
 applyTheme(savedTheme === "light" ? "light" : "dark");
@@ -42,10 +37,7 @@ themeToggle?.addEventListener("click", () => {
 });
 
 
-if (!canvas) {
-  // no canvas -> just exit gracefully
-  console.warn("hero3d canvas not found");
-} else {
+if (canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   const scene = new THREE.Scene();
@@ -55,21 +47,24 @@ if (!canvas) {
   scene.add(group);
 
 
-  const key = new THREE.DirectionalLight(0xffffff, 1.2);
+  const key = new THREE.DirectionalLight(0xffffff, 1.15);
   key.position.set(3, 3, 3);
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0x88aaff, 0.55);
+  const fill = new THREE.DirectionalLight(0x9aa7ff, 0.55);
   fill.position.set(-4, 2, -2);
   scene.add(fill);
-  const rim = new THREE.PointLight(0x21d4ff, 1.1, 30);
-  rim.position.set(0, 1.6, 4);
-  scene.add(rim);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.32));
+  const rimCyan = new THREE.PointLight(0x21d4ff, 1.15, 30);
+  rimCyan.position.set(0, 1.4, 4);
+  scene.add(rimCyan);
+  const rimRed = new THREE.PointLight(0xff3d6a, 0.75, 30);
+  rimRed.position.set(-2.2, -0.6, 3.0);
+  scene.add(rimRed);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.30));
 
 
   const crystal = new THREE.Group();
   group.add(crystal);
-  const crystalGeo = new THREE.OctahedronGeometry(1.25, 0);
+  const geo = new THREE.OctahedronGeometry(1.25, 0);
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: 0x0a0f18,
     metalness: 0.35,
@@ -80,10 +75,11 @@ if (!canvas) {
     clearcoat: 1.0,
     clearcoatRoughness: 0.12
   });
-  const core = new THREE.Mesh(crystalGeo, glassMat);
+
+  const core = new THREE.Mesh(geo, glassMat);
   crystal.add(core);
   const wire = new THREE.Mesh(
-    crystalGeo,
+    geo,
     new THREE.MeshBasicMaterial({
       color: 0x21d4ff,
       wireframe: true,
@@ -93,13 +89,13 @@ if (!canvas) {
   );
   wire.scale.setScalar(1.015);
   crystal.add(wire);
-  const edges = new THREE.EdgesGeometry(crystalGeo);
+  const edges = new THREE.EdgesGeometry(geo);
   const edgeLines = new THREE.LineSegments(
     edges,
     new THREE.LineBasicMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.75
+      opacity: 0.72
     })
   );
   edgeLines.scale.setScalar(1.02);
@@ -110,8 +106,8 @@ if (!canvas) {
       color: 0x7c5cff,
       metalness: 0.2,
       roughness: 0.25,
-      emissive: 0x160b2a,
-      emissiveIntensity: 1.1
+      emissive: 0x140a2a,
+      emissiveIntensity: 1.0
     })
   );
   inner.rotation.set(0.6, 0.2, 0.1);
@@ -141,8 +137,6 @@ if (!canvas) {
     };
     crystal.add(shard);
   }
-
-
   function resize() {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
@@ -160,25 +154,16 @@ if (!canvas) {
     mx = (e.clientX / window.innerWidth) * 2 - 1;
     my = (e.clientY / window.innerHeight) * 2 - 1;
   });
-
-
   let t = 0;
   function animate() {
     requestAnimationFrame(animate);
-    if (!enabled3d) return;
-
     t += 0.01;
-
-
     group.rotation.y = t * 0.18;
     group.rotation.x = Math.sin(t * 0.55) * 0.10;
     group.rotation.z = Math.cos(t * 0.40) * 0.08;
-
-
+    
     crystal.rotation.y += 0.008;
     crystal.rotation.x += 0.006;
-
-
     crystal.children.forEach((obj) => {
       if (obj.userData?.spin) {
         obj.rotation.x += obj.userData.spin.x;
@@ -187,16 +172,10 @@ if (!canvas) {
       }
     });
 
-
     camera.position.x = mx * 0.35;
     camera.position.y = 0.25 + (-my * 0.22);
 
     renderer.render(scene, camera);
   }
   animate();
-  toggle3dBtn?.addEventListener("click", () => {
-    enabled3d = !enabled3d;
-    toggle3dBtn.textContent = enabled3d ? "3D: увімкнено" : "3D: вимкнено";
-    if (enabled3d) renderer.render(scene, camera);
-  });
 }
