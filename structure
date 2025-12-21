@@ -1,4 +1,12 @@
-index.html
-styles.css
-app.js
-ui.js
+/frontend
+  index.html
+  styles.css
+  app.js
+  ui.js
+
+/backend
+  package.json
+  server.js
+  db.js
+  .env
+  pgen.db
