@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PGen.xyz — Password Tools</title>
+  <title>PGen.xyz</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="./css/styles.css" />
-<script src="./js/app.js"></script>
-<script type="module" src="./js/ui.js"></script>
 </head>
+
 <body>
   <header class="topbar">
     <div class="topLeft">
@@ -19,10 +20,12 @@
         <span class="brandMain">PGen</span><span class="brandSub">.xyz</span>
       </div>
     </div>
+
     <nav class="nav">
       <a class="navLink" href="#home">HOME</a>
       <a class="navLink" href="#app">APP</a>
     </nav>
+
     <a class="pillBtn" href="#app">OPEN APP</a>
   </header>
 
@@ -35,18 +38,21 @@
             <span class="kDot"></span>
             OFFLINE PASSWORD TOOLKIT
           </div>
+
           <h1 class="headline">
             GENERATE.<br>
             CHECK.<br>
             <span class="lime">SECURE.</span>
           </h1>
+
           <div class="leftMeta">
             <div class="metaTitle">WHAT IT DOES</div>
             <p class="metaText">
-              Build passwords with custom length and character sets, analyze strength,
+              Generate passwords with custom length and character sets, analyze strength,
               get tips, copy to clipboard, and keep a small local history.
             </p>
           </div>
+
           <div class="leftIcons">
             <div class="miniIcon" title="Scroll down">
               <span class="chev"></span>
@@ -70,9 +76,11 @@
               </textPath>
             </text>
           </svg>
+
           <div class="ringRing"></div>
           <div class="orbit orbitA"></div>
           <div class="orbit orbitB"></div>
+
           <canvas id="crystal3d" class="crystalCanvas" aria-hidden="true"></canvas>
 
           <div class="dot d1"></div>
@@ -80,12 +88,14 @@
           <div class="dot d3"></div>
           <div class="dot d4"></div>
           <div class="dot d5"></div>
+
           <div class="rightLabel">
             <div class="rightTitle">3D MODULE</div>
             <div class="rightSub">Tetra wireframe + edges</div>
           </div>
         </div>
       </div>
+
     </div>
 
     <div class="marquee">
@@ -102,40 +112,51 @@
         <h2 class="sectionTitle">Application</h2>
         <p class="sectionText">Generator + strength checker + local history.</p>
       </div>
+
       <div class="chipRow">
         <div class="chip">JavaScript</div>
         <div class="chip">localStorage</div>
         <div class="chip">Clipboard API</div>
+        <div class="chip">Optional backend</div>
       </div>
     </div>
+
     <main class="grid">
-      <!-- Generator -->
+      
       <section class="card">
         <div class="cardBody">
           <h3 class="cardTitle">1) Password Generator</h3>
+
           <div class="row">
             <label class="label">
               Length:
               <input id="lengthInput" type="number" min="4" max="64" value="12" />
             </label>
           </div>
+
           <div class="options">
             <label class="label"><input id="lowerCheckbox" type="checkbox" checked /> lowercase (a–z)</label>
             <label class="label"><input id="upperCheckbox" type="checkbox" checked /> uppercase (A–Z)</label>
             <label class="label"><input id="digitsCheckbox" type="checkbox" checked /> digits (0–9)</label>
             <label class="label"><input id="symbolsCheckbox" type="checkbox" /> symbols (!@#…)</label>
           </div>
+
           <div class="buttons">
             <button id="generateBtn" class="btn" type="button">Generate</button>
             <button id="clearBtn" class="btn btnGhost" type="button">Clear</button>
           </div>
+
           <div class="divider"></div>
+
           <input id="passwordInput" type="text" placeholder="Type a password or generate one" />
+
           <div class="buttons">
             <button id="copyBtn" class="btn" type="button">Copy</button>
             <button id="saveBtn" class="btn btnGhost" type="button">Save to History</button>
           </div>
+
           <div id="message" class="hint"></div>
+
           <div class="history">
             <div class="historyHeader">
               <div><b>History (max 10)</b></div>
@@ -149,6 +170,7 @@
       <section class="card cardWide">
         <div class="cardBody">
           <h3 class="cardTitle">2) Strength Checker</h3>
+
           <div class="row between">
             <div class="row" style="gap:10px;">
               <span class="smallText">Strength:</span>
@@ -156,12 +178,16 @@
             </div>
             <div id="scoreText" class="smallText">0/100</div>
           </div>
+
           <div class="progress">
             <div id="progressBar" class="progressBar"></div>
           </div>
+
           <div id="checks" class="checks"></div>
+
           <h3 class="cardTitle" style="margin-top:18px;">Tips</h3>
           <ul id="tips"></ul>
+
           <div class="footerNote">
             Educational project. Uses a basic scoring model.
           </div>
@@ -169,7 +195,8 @@
       </section>
     </main>
   </section>
-  <script src="app.js"></script>
-  <script type="module" src="ui.js"></script>
+
+  <script src="./js/app.js"></script>
+  <script type="module" src="./js/ui.js"></script>
 </body>
 </html>
