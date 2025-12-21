@@ -1,172 +1,113 @@
+const API_BASE = "http://localhost:5050";
+const API_KEY = "pgen_demo_key_123"; // must match backend .env (API_KEY)
+const HISTORY_KEY = "pgen_history_v1";
+const HISTORY_LIMIT = 10;
+
 const lengthInput = document.getElementById("lengthInput");
 const lowerCheckbox = document.getElementById("lowerCheckbox");
 const upperCheckbox = document.getElementById("upperCheckbox");
 const digitsCheckbox = document.getElementById("digitsCheckbox");
 const symbolsCheckbox = document.getElementById("symbolsCheckbox");
+
 const generateBtn = document.getElementById("generateBtn");
 const clearBtn = document.getElementById("clearBtn");
-const passwordInput = document.getElementById("passwordInput");
 const copyBtn = document.getElementById("copyBtn");
 const saveBtn = document.getElementById("saveBtn");
-const message = document.getElementById("message");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+
+const passwordInput = document.getElementById("passwordInput");
+const messageEl = document.getElementById("message");
+
+const historyList = document.getElementById("historyList");
+
 const strengthLabel = document.getElementById("strengthLabel");
 const scoreText = document.getElementById("scoreText");
 const progressBar = document.getElementById("progressBar");
 const checksEl = document.getElementById("checks");
 const tipsEl = document.getElementById("tips");
-const historyList = document.getElementById("historyList");
-const clearHistoryBtn = document.getElementById("clearHistoryBtn");
-const HISTORY_KEY = "pgen_xyz_history_v1";
-const HISTORY_LIMIT = 10;
-const SETS = {
-  lower: "abcdefghijklmnopqrstuvwxyz",
-  upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  digits: "0123456789",
-  symbols: "!@#$%^&*()_+-=[]{};:,.<>/?~"
-};
-function clamp(n, min, max) {
-  return Math.max(min, Math.min(max, n));
-}
-function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-function getSelectedPools() {
-  const pools = [];
-  if (lowerCheckbox.checked) pools.push(SETS.lower);
-  if (upperCheckbox.checked) pools.push(SETS.upper);
-  if (digitsCheckbox.checked) pools.push(SETS.digits);
-  if (symbolsCheckbox.checked) pools.push(SETS.symbols);
-  return pools;
-}
-function randomChar(str) {
-  return str[Math.floor(Math.random() * str.length)];
-}
+
+let msgTimer = null;
+
 function setMessage(text) {
-  if (!message) return;
-  message.textContent = text || "";
+  if (!messageEl) return;
+  messageEl.textContent = text || "";
+  if (msgTimer) clearTimeout(msgTimer);
+  if (text) {
+    msgTimer = setTimeout(() => {
+      messageEl.textContent = "";
+    }, 2200);
+  }
 }
-function generatePassword() {
-  const pools = getSelectedPools();
-  if (pools.length === 0) {
-    setMessage("Select at least one character set.");
-    return "";
-  }
-  let len = parseInt(lengthInput.value, 10);
-  if (Number.isNaN(len)) len = 12;
-  len = clamp(len, 4, 64);
 
-  if (len < pools.length) len = pools.length;
-  lengthInput.value = String(len);
-
-  const chars = [];
-
-
-  for (const pool of pools) chars.push(randomChar(pool));
-
-  const all = pools.join("");
-  while (chars.length < len) chars.push(randomChar(all));
-  shuffleArray(chars);
-  setMessage("Password generated.");
-  return chars.join("");
+function clamp(n, a, b) {
+  return Math.max(a, Math.min(b, n));
 }
-function analyzePassword(pw) {
-  const result = {
-    score: 0,
-    level: "—",
-    checks: [],
-    tips: []
-  };
-  if (!pw || pw.length === 0) {
-    result.tips.push("Type a password to see analysis.");
-    return result;
-  }
-  const hasLower = /[a-z]/.test(pw);
-  const hasUpper = /[A-Z]/.test(pw);
-  const hasDigit = /[0-9]/.test(pw);
-  const hasSymbol = /[^a-zA-Z0-9]/.test(pw);
-  const hasRepeat = /(.)\1{2,}/.test(pw); // aaa / 111
 
-
-  const len = pw.length;
-  let score = 0;
-
-  if (len >= 8) score += 20; else result.tips.push("Use at least 8 characters.");
-  if (len >= 12) score += 20; else result.tips.push("12+ characters is much better.");
-  if (len >= 16) score += 10;
-
-
-  if (hasLower) score += 10; else result.tips.push("Add lowercase letters.");
-  if (hasUpper) score += 10; else result.tips.push("Add uppercase letters.");
-  if (hasDigit) score += 10; else result.tips.push("Add digits.");
-  if (hasSymbol) score += 15; else result.tips.push("Add symbols for stronger passwords.");
-
-
-  if (hasRepeat) {
-    score -= 10;
-    result.tips.push("Avoid repeating characters like aaa or 111.");
-  }
-
-
-  const typeCount = [hasLower, hasUpper, hasDigit, hasSymbol].filter(Boolean).length;
-  if (typeCount <= 1) {
-    score -= 12;
-    result.tips.push("Mix different character types.");
-  }
-  score = clamp(score, 0, 100);
-
-
-  let level = "Weak";
-  if (score >= 70) level = "Strong";
-  else if (score >= 40) level = "Medium";
-  result.score = score;
-  result.level = level;
-
-
-  result.checks = [
-    { ok: len >= 8, label: "Length ≥ 8" },
-    { ok: len >= 12, label: "Length ≥ 12" },
-    { ok: hasLower, label: "Lowercase letters" },
-    { ok: hasUpper, label: "Uppercase letters" },
-    { ok: hasDigit, label: "Digits" },
-    { ok: hasSymbol, label: "Symbols" },
-    { ok: !hasRepeat, label: "No repeats (aaa/111)" }
-  ];
-
-
-  if (result.tips.length === 0) result.tips.push("Looks good. Consider using a password manager.");
-
-  return result;
+function uniqCharsCount(str) {
+  return new Set(str.split("")).size;
 }
-function renderAnalysis(pw) {
-  const data = analyzePassword(pw);
-  if (strengthLabel) strengthLabel.textContent = data.level;
-  if (scoreText) scoreText.textContent = `${data.score}/100`;
-  if (progressBar) {
-    progressBar.style.width = `${data.score}%`;
-  }
-  if (checksEl) {
-    checksEl.innerHTML = "";
-    for (const c of data.checks) {
-      const div = document.createElement("div");
-      div.className = c.ok ? "ok" : "bad";
-      div.textContent = `${c.ok ? "✓" : "✗"} ${c.label}`;
-      checksEl.appendChild(div);
+
+function hasLower(s) { return /[a-z]/.test(s); }
+function hasUpper(s) { return /[A-Z]/.test(s); }
+function hasDigit(s) { return /[0-9]/.test(s); }
+function hasSymbol(s) { return /[^a-zA-Z0-9]/.test(s); }
+
+function estimatePoolSize(opts) {
+  let pool = 0;
+  if (opts.lower) pool += 26;
+  if (opts.upper) pool += 26;
+  if (opts.digits) pool += 10;
+  if (opts.symbols) pool += 32; // rough typical printable symbols count
+  return pool;
+}
+
+function entropyBits(length, poolSize) {
+  if (length <= 0 || poolSize <= 1) return 0;
+  return Math.log2(Math.pow(poolSize, length));
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      ...(options.headers || {})
     }
-  }
-  if (tipsEl) {
-    tipsEl.innerHTML = "";
-    for (const t of data.tips) {
-      const li = document.createElement("li");
-      li.textContent = t;
-      tipsEl.appendChild(li);
-    }
+  });
+  if (!res.ok) throw new Error(`API error ${res.status}`);
+  return res.json();
+}
+
+async function tryLoadSettingsFromServer() {
+  try {
+    const s = await api("/api/settings");
+    lengthInput.value = s.length;
+    lowerCheckbox.checked = !!s.lower;
+    upperCheckbox.checked = !!s.upper;
+    digitsCheckbox.checked = !!s.digits;
+    symbolsCheckbox.checked = !!s.symbols;
+  } catch {
   }
 }
-function loadHistory() {
+
+async function pushSettingsToServer() {
+  try {
+    await api("/api/settings", {
+      method: "PUT",
+      body: JSON.stringify({
+        length: parseInt(lengthInput.value, 10),
+        lower: lowerCheckbox.checked,
+        upper: upperCheckbox.checked,
+        digits: digitsCheckbox.checked,
+        symbols: symbolsCheckbox.checked
+      })
+    });
+  } catch {
+  }
+}
+
+function loadHistoryLocal() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
     const arr = raw ? JSON.parse(raw) : [];
@@ -175,101 +116,317 @@ function loadHistory() {
     return [];
   }
 }
-function saveHistory(list) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
-}
-function renderHistory() {
-  if (!historyList) return;
-  const items = loadHistory();
-  historyList.innerHTML = "";
-  if (items.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "hint";
-    empty.textContent = "No saved passwords yet.";
-    historyList.appendChild(empty);
-    return;
-  }
-  for (const pw of items) {
-    const row = document.createElement("div");
-    row.className = "historyItem";
-    const left = document.createElement("div");
-    left.className = "mono";
-    left.textContent = pw;
-    const right = document.createElement("button");
-    right.className = "btn";
-    right.type = "button";
-    right.textContent = "Use";
-    right.addEventListener("click", () => {
-      passwordInput.value = pw;
-      setMessage("Loaded from history.");
-      renderAnalysis(pw);
-    });
-    row.appendChild(left);
-    row.appendChild(right);
-    historyList.appendChild(row);
-  }
-}
-async function copyToClipboard(text) {
-  if (!text) return false;
+
+function saveHistoryLocal(arr) {
   try {
-    await navigator.clipboard.writeText(text);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, HISTORY_LIMIT)));
+  } catch {
+  }
+}
+
+function addToHistoryLocal(pw) {
+  const arr = loadHistoryLocal();
+  const next = [pw, ...arr.filter(x => x !== pw)].slice(0, HISTORY_LIMIT);
+  saveHistoryLocal(next);
+}
+
+function clearHistoryLocal() {
+  try {
+    localStorage.removeItem(HISTORY_KEY);
+  } catch {
+  }
+}
+
+async function getHistory() {
+  try {
+    const rows = await api("/api/history");
+    return rows.map(r => r.password);
+  } catch {
+    return loadHistoryLocal();
+  }
+}
+
+async function addHistory(pw) {
+  try {
+    await api("/api/history", { method: "POST", body: JSON.stringify({ password: pw }) });
     return true;
   } catch {
-
-    const tmp = document.createElement("textarea");
-    tmp.value = text;
-    tmp.style.position = "fixed";
-    tmp.style.left = "-9999px";
-    document.body.appendChild(tmp);
-    tmp.select();
-    const ok = document.execCommand("copy");
-    document.body.removeChild(tmp);
-    return ok;
+    addToHistoryLocal(pw);
+    return false;
   }
 }
 
+async function clearHistoryAll() {
+  try {
+    await api("/api/history", { method: "DELETE" });
+    return true;
+  } catch {
+    clearHistoryLocal();
+    return false;
+  }
+}
+
+function buildAlphabet() {
+  const lower = "abcdefghijklmnopqrstuvwxyz";
+  const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const digits = "0123456789";
+  const symbols = "!@#$%^&*()-_=+[]{};:,.<>?/~|";
+
+  let pool = "";
+  if (lowerCheckbox.checked) pool += lower;
+  if (upperCheckbox.checked) pool += upper;
+  if (digitsCheckbox.checked) pool += digits;
+  if (symbolsCheckbox.checked) pool += symbols;
+  return pool;
+}
+
+function randomChar(str) {
+  const idx = Math.floor(Math.random() * str.length);
+  return str[idx];
+}
+
+function generatePassword(len) {
+  const pool = buildAlphabet();
+  if (!pool.length) return "";
+
+  const required = [];
+  if (lowerCheckbox.checked) required.push("abcdefghijklmnopqrstuvwxyz");
+  if (upperCheckbox.checked) required.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  if (digitsCheckbox.checked) required.push("0123456789");
+  if (symbolsCheckbox.checked) required.push("!@#$%^&*()-_=+[]{};:,.<>?/~|");
+
+  const chars = [];
+
+  for (const group of required) {
+    if (chars.length < len) chars.push(randomChar(group));
+  }
+
+  while (chars.length < len) chars.push(randomChar(pool));
+
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+
+  return chars.join("");
+}
+
+function analyzePassword(pw) {
+  const length = pw.length;
+
+  const checks = {
+    length8: length >= 8,
+    length12: length >= 12,
+    lower: hasLower(pw),
+    upper: hasUpper(pw),
+    digits: hasDigit(pw),
+    symbols: hasSymbol(pw),
+    noRepeatHeavy: uniqCharsCount(pw) >= Math.max(6, Math.floor(length * 0.6))
+  };
+
+  let score = 0;
+
+  if (length >= 8) score += 20;
+  if (length >= 12) score += 20;
+  if (length >= 16) score += 10;
+
+  const variety = [checks.lower, checks.upper, checks.digits, checks.symbols].filter(Boolean).length;
+  score += variety * 10; // up to 40
+
+  if (!checks.noRepeatHeavy && length >= 8) score -= 10;
+
+  score = clamp(score, 0, 100);
+
+  let label = "Very weak";
+  if (score >= 80) label = "Strong";
+  else if (score >= 60) label = "Good";
+  else if (score >= 40) label = "Medium";
+  else if (score >= 20) label = "Weak";
+
+  const tips = [];
+  if (length < 12) tips.push("Increase length to at least 12 characters.");
+  if (!checks.lower) tips.push("Add lowercase letters (a–z).");
+  if (!checks.upper) tips.push("Add uppercase letters (A–Z).");
+  if (!checks.digits) tips.push("Add digits (0–9).");
+  if (!checks.symbols) tips.push("Add symbols (!@#...).");
+  if (!checks.noRepeatHeavy) tips.push("Avoid repeating the same characters too much.");
+
+  const guessed = {
+    lower: checks.lower,
+    upper: checks.upper,
+    digits: checks.digits,
+    symbols: checks.symbols
+  };
+  const pool = estimatePoolSize(guessed);
+  const bits = entropyBits(length, pool);
+
+  return { score, label, checks, tips, entropy: bits };
+}
+
+function renderChecks(checks) {
+  if (!checksEl) return;
+  const rows = [
+    { ok: checks.length8, text: "Length ≥ 8" },
+    { ok: checks.length12, text: "Length ≥ 12" },
+    { ok: checks.lower, text: "Has lowercase" },
+    { ok: checks.upper, text: "Has uppercase" },
+    { ok: checks.digits, text: "Has digits" },
+    { ok: checks.symbols, text: "Has symbols" },
+    { ok: checks.noRepeatHeavy, text: "Not too repetitive" }
+  ];
+
+  checksEl.innerHTML = rows.map(r => {
+    const cls = r.ok ? "ok" : "bad";
+    const mark = r.ok ? "✓" : "—";
+    return `<div class="${cls}">${mark} ${r.text}</div>`;
+  }).join("");
+}
+
+function renderTips(tips, entropy) {
+  if (!tipsEl) return;
+
+  const list = tips.slice();
+  list.unshift(`Estimated entropy: ~${Math.round(entropy)} bits`);
+
+  tipsEl.innerHTML = list.map(t => `<li>${escapeHtml(t)}</li>`).join("");
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderAnalysis(pw) {
+  const a = analyzePassword(pw);
+
+  if (strengthLabel) strengthLabel.textContent = a.label;
+  if (scoreText) scoreText.textContent = `${a.score}/100`;
+  if (progressBar) progressBar.style.width = `${a.score}%`;
+
+  renderChecks(a.checks);
+  renderTips(a.tips, a.entropy);
+}
+
+async function renderHistory() {
+  if (!historyList) return;
+  const items = await getHistory();
+
+  if (!items.length) {
+    historyList.innerHTML = `<div class="smallText">No saved passwords yet.</div>`;
+    return;
+  }
+
+  historyList.innerHTML = items.map((pw) => {
+    const safe = escapeHtml(pw);
+    return `
+      <div class="historyItem">
+        <div class="mono">${safe}</div>
+        <div class="row" style="gap:8px;">
+          <button class="btn btnGhost histUse" type="button" data-pw="${safe}">Use</button>
+          <button class="btn btnGhost histCopy" type="button" data-pw="${safe}">Copy</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  historyList.querySelectorAll(".histUse").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const pw = btn.getAttribute("data-pw") || "";
+      passwordInput.value = pw;
+      renderAnalysis(pw);
+      setMessage("Loaded from history.");
+    });
+  });
+
+  historyList.querySelectorAll(".histCopy").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const pw = btn.getAttribute("data-pw") || "";
+      try {
+        await navigator.clipboard.writeText(pw);
+        setMessage("Copied.");
+      } catch {
+        setMessage("Copy failed (browser blocked).");
+      }
+    });
+  });
+}
+
+function getLen() {
+  const n = parseInt(lengthInput.value, 10);
+  return clamp(Number.isFinite(n) ? n : 12, 4, 64);
+}
 
 generateBtn?.addEventListener("click", () => {
-  const pw = generatePassword();
-  if (!pw) return;
+  const len = getLen();
+  const pool = buildAlphabet();
+  if (!pool.length) {
+    setMessage("Select at least one character set.");
+    return;
+  }
+
+  const pw = generatePassword(len);
   passwordInput.value = pw;
   renderAnalysis(pw);
+  setMessage("Generated.");
 });
+
 clearBtn?.addEventListener("click", () => {
   passwordInput.value = "";
-  setMessage("Cleared.");
   renderAnalysis("");
+  setMessage("Cleared.");
 });
-passwordInput?.addEventListener("input", () => {
-  setMessage("");
-  renderAnalysis(passwordInput.value);
-});
+
 copyBtn?.addEventListener("click", async () => {
   const pw = passwordInput.value.trim();
   if (!pw) {
     setMessage("Nothing to copy.");
     return;
   }
-  const ok = await copyToClipboard(pw);
-  setMessage(ok ? "Copied to clipboard." : "Copy failed (browser blocked).");
+  try {
+    await navigator.clipboard.writeText(pw);
+    setMessage("Copied to clipboard.");
+  } catch {
+    setMessage("Copy failed (browser blocked).");
+  }
 });
-saveBtn?.addEventListener("click", () => {
+
+saveBtn?.addEventListener("click", async () => {
   const pw = passwordInput.value.trim();
   if (!pw) {
     setMessage("Nothing to save.");
     return;
   }
-  const items = loadHistory();
-  const next = [pw, ...items.filter(x => x !== pw)].slice(0, HISTORY_LIMIT);
-  saveHistory(next);
-  setMessage("Saved to history.");
-  renderHistory();
-});
-clearHistoryBtn?.addEventListener("click", () => {
-  saveHistory([]);
-  setMessage("History cleared.");
-  renderHistory();
+
+  const savedToServer = await addHistory(pw);
+  await renderHistory();
+
+  setMessage(savedToServer ? "Saved to server history." : "Saved locally (server offline).");
 });
 
-renderHistory();
-renderAnalysis("");
+clearHistoryBtn?.addEventListener("click", async () => {
+  const ok = await clearHistoryAll();
+  await renderHistory();
+  setMessage(ok ? "Server history cleared." : "Local history cleared.");
+});
+
+passwordInput?.addEventListener("input", () => {
+  renderAnalysis(passwordInput.value);
+});
+
+[lengthInput, lowerCheckbox, upperCheckbox, digitsCheckbox, symbolsCheckbox].forEach((el) => {
+  el?.addEventListener("change", () => {
+    // keep length sane
+    if (el === lengthInput) lengthInput.value = String(getLen());
+    pushSettingsToServer();
+  });
+});
+
+(async () => {
+  renderAnalysis(passwordInput?.value || "");
+  await tryLoadSettingsFromServer();     // optional
+  await renderHistory();                 // server first, fallback local
+})();
