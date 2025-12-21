@@ -1,12 +1,17 @@
-/frontend
-  index.html
-  styles.css
-  app.js
-  ui.js
+pgen/
+  backend/
+    server.js
+    db.js
+    package.json
+    ...
 
-/backend
-  package.json
-  server.js
-  db.js
-  .env
-  pgen.db
+  frontend/
+    index.html
+    css/
+      styles.css
+    js/
+      app.js
+      ui.js
+
+  README.md
+  structure
