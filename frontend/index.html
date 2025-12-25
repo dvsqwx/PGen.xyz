@@ -3,198 +3,204 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PGen.xyz</title>
-
-  <base href="./" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>PGen.xyz - Password & Mail Generator</title>
+  <link rel="stylesheet" href="./css/styles.css" />
 </head>
-
 <body>
-  <header class="topbar">
+
+  <div class="topbar">
     <div class="topLeft">
       <div class="logoMark"></div>
-      <div class="brand">
-        <span class="brandMain">PGen</span><span class="brandSub">.xyz</span>
+      <div>
+        <div class="brand">PGen<span class="brandSub">.xyz</span></div>
       </div>
     </div>
+    <div class="nav">
+      <a href="#" class="navLink">Features</a>
+      <a href="#" class="navLink">Security</a>
+      <a href="#pmSection" class="navLink">Manager</a>
+    </div>
+    <a href="#app" class="pillBtn">Get Started</a>
+  </div>
 
-    <nav class="nav">
-      <a class="navLink" href="#home">HOME</a>
-      <a class="navLink" href="#app">APP</a>
-    </nav>
-
-    <a class="pillBtn" href="#app">OPEN APP</a>
-  </header>
-
-  <section id="home" class="hero">
+  <div class="hero">
     <div class="heroGrid">
       <div class="panel leftPanel">
         <div class="leftInner">
           <div class="heroKicker">
-            <span class="kDot"></span>
-            OFFLINE PASSWORD TOOLKIT
+            <div class="kDot"></div>
+            <span>v2.0 Local & Secure</span>
           </div>
-
-          <h1 class="headline">
-            GENERATE.<br>
-            CHECK.<br>
-            <span class="lime">SECURE.</span>
-          </h1>
-
+          <h1 class="headline">Secure <br><span class="lime">Gen</span>eration</h1>
           <div class="leftMeta">
-            <div class="metaTitle">WHAT IT DOES</div>
+            <div class="metaTitle">Mission</div>
             <p class="metaText">
-              Generate passwords with custom length and character sets, analyze strength,
-              get tips, copy to clipboard, and keep a small local history.
+              Generate cryptographically strong passwords and anonymous emails directly in your browser. 
+              No backend storage for sensitive data.
             </p>
           </div>
-
           <div class="leftIcons">
-            <div class="miniIcon" title="Scroll down">
-              <span class="chev"></span>
-              <span class="chev"></span>
-            </div>
-            <a class="miniArrow" href="#app" title="Go to App"></a>
+            <div class="miniIcon"><div class="chev"></div></div>
+            <div class="miniArrow"></div>
           </div>
         </div>
       </div>
-
       <div class="panel rightPanel">
         <div class="ringStage">
-          <svg class="ringText" viewBox="0 0 500 500" aria-hidden="true">
-            <defs>
-              <path id="circlePath" d="M250,250 m-190,0 a190,190 0 1,1 380,0 a190,190 0 1,1 -380,0"/>
-            </defs>
-            <text>
-              <textPath href="#circlePath" startOffset="0%">
-                PGEN.XYZ • PASSWORD GENERATOR • STRENGTH CHECKER • LOCAL HISTORY •
-              </textPath>
-            </text>
-          </svg>
-
           <div class="ringRing"></div>
           <div class="orbit orbitA"></div>
           <div class="orbit orbitB"></div>
-
-          <canvas id="crystal3d" class="crystalCanvas" aria-hidden="true"></canvas>
-
-          <div class="dot d1"></div>
-          <div class="dot d2"></div>
-          <div class="dot d3"></div>
-          <div class="dot d4"></div>
-          <div class="dot d5"></div>
-
+          <canvas id="crystal3d" class="crystalCanvas"></canvas>
           <div class="rightLabel">
-            <div class="rightTitle">3D MODULE</div>
-            <div class="rightSub">Tetra wireframe + edges</div>
+            <div class="rightTitle">Entropy Core</div>
+            <div class="rightSub">Active</div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="marquee">
-      <div class="marqueeTrack">
-        PGEN.XYZ&nbsp;&nbsp;+&nbsp;&nbsp;PASSWORD GENERATOR&nbsp;&nbsp;+&nbsp;&nbsp;STRENGTH CHECKER&nbsp;&nbsp;+&nbsp;&nbsp;CLIPBOARD&nbsp;&nbsp;+&nbsp;&nbsp;LOCAL HISTORY&nbsp;&nbsp;+&nbsp;&nbsp;
-        PGEN.XYZ&nbsp;&nbsp;+&nbsp;&nbsp;PASSWORD GENERATOR&nbsp;&nbsp;+&nbsp;&nbsp;STRENGTH CHECKER&nbsp;&nbsp;+&nbsp;&nbsp;CLIPBOARD&nbsp;&nbsp;+&nbsp;&nbsp;LOCAL HISTORY&nbsp;&nbsp;+&nbsp;&nbsp;
-      </div>
+  <div class="marquee">
+    <div class="marqueeTrack">
     </div>
-  </section>
+  </div>
 
-  <section id="app" class="appSection">
+  <div id="app" class="appSection">
     <div class="appHeader">
       <div>
-        <h2 class="sectionTitle">Application</h2>
-        <p class="sectionText">Generator + strength checker + local history.</p>
+        <h2 class="sectionTitle">Generator Suite</h2>
+        <p class="sectionText">Create credentials instantly.</p>
       </div>
-
       <div class="chipRow">
-        <div class="chip">JavaScript</div>
-        <div class="chip">localStorage</div>
-        <div class="chip">Clipboard API</div>
-        <div class="chip">Optional backend</div>
+        <div class="chip">AES-256</div>
+        <div class="chip">Client-side</div>
       </div>
     </div>
 
-    <main class="grid">
-      <section class="card">
+    <div class="grid">
+      <div class="card">
         <div class="cardBody">
-          <h3 class="cardTitle">1) Password Generator</h3>
-
-          <div class="row">
-            <label class="label">
-              Length:
-              <input id="lengthInput" type="number" min="4" max="64" value="12" />
-            </label>
-          </div>
+          <h3 class="cardTitle">Password Generator</h3>
+          
+          <input type="text" id="passwordInput" placeholder="Click generate..." />
+          <div class="smallText hint" id="message"></div>
 
           <div class="options">
-            <label class="label"><input id="lowerCheckbox" type="checkbox" checked /> lowercase (a–z)</label>
-            <label class="label"><input id="upperCheckbox" type="checkbox" checked /> uppercase (A–Z)</label>
-            <label class="label"><input id="digitsCheckbox" type="checkbox" checked /> digits (0–9)</label>
-            <label class="label"><input id="symbolsCheckbox" type="checkbox" /> symbols (!@#…)</label>
-          </div>
-
-          <div class="buttons">
-            <button id="generateBtn" class="btn" type="button">Generate</button>
-            <button id="clearBtn" class="btn btnGhost" type="button">Clear</button>
-          </div>
-
-          <div class="divider"></div>
-
-          <input id="passwordInput" type="text" placeholder="Type a password or generate one" />
-
-          <div class="buttons">
-            <button id="copyBtn" class="btn" type="button">Copy</button>
-            <button id="saveBtn" class="btn btnGhost" type="button">Save to History</button>
-          </div>
-
-          <div id="message" class="hint"></div>
-
-          <div class="history">
-            <div class="historyHeader">
-              <div><b>History (max 10)</b></div>
-              <button id="clearHistoryBtn" class="btn btnGhost" type="button">Clear History</button>
+            <div class="row between" style="margin-bottom:12px;">
+              <label class="label">Length</label>
+              <input type="number" id="lengthInput" value="16" min="4" max="64" />
             </div>
-            <div id="historyList"></div>
+            <div class="divider"></div>
+            <div class="checks">
+              <label class="label"><input type="checkbox" id="lowerCheckbox" checked> a-z</label>
+              <label class="label"><input type="checkbox" id="upperCheckbox" checked> A-Z</label>
+              <label class="label"><input type="checkbox" id="digitsCheckbox" checked> 0-9</label>
+              <label class="label"><input type="checkbox" id="symbolsCheckbox"> #@!</label>
+            </div>
+          </div>
+
+          <div class="buttons">
+            <button class="btn" id="generateBtn">Generate</button>
+            <button class="btn btnGhost" id="copyBtn">Copy</button>
+            <button class="btn btnGhost" id="saveBtn">Save to History</button>
+            <button class="btn btnGhost" id="clearBtn">Clear</button>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section class="card cardWide">
+      <div class="card">
         <div class="cardBody">
-          <h3 class="cardTitle">2) Strength Checker</h3>
-
+          <h3 class="cardTitle">Security Analysis</h3>
+          
           <div class="row between">
-            <div class="row" style="gap:10px;">
-              <span class="smallText">Strength:</span>
-              <span id="strengthLabel" class="badge">—</span>
-            </div>
-            <div id="scoreText" class="smallText">0/100</div>
+            <div class="badge" id="strengthLabel">Unknown</div>
+            <div class="mono" id="scoreText">0/100</div>
           </div>
 
           <div class="progress">
-            <div id="progressBar" class="progressBar"></div>
+            <div class="progressBar" id="progressBar"></div>
           </div>
 
-          <div id="checks" class="checks"></div>
+          <div id="checks" class="checks" style="margin-top:20px;">
+            </div>
 
-          <h3 class="cardTitle" style="margin-top:18px;">Tips</h3>
-          <ul id="tips"></ul>
+          <div class="divider"></div>
+          <div class="smallText">Tips:</div>
+          <ul id="tips">
+            <li>Generate a password to see analysis.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-          <div class="footerNote">
-            Educational project. Uses a basic scoring model.
+    <div class="grid" style="margin-top: 16px;">
+      
+      <div class="card">
+        <div class="cardBody">
+          <h3 class="cardTitle">Mail Generator</h3>
+          
+          <input type="text" id="emailInput" placeholder="generated@mail..." readonly />
+          <div class="smallText hint">Temp mail alias</div>
+
+          <div class="options">
+            <div class="label" style="margin-bottom:8px;">Domain Provider</div>
+            <select id="domainSelect" style="width:100%; padding:12px; border-radius:12px; background:rgba(0,0,0,0.35); border:1px solid rgba(242,242,242,0.12); color:#fff; outline:none;">
+              <option value="random">Random Domain</option>
+              <option value="gmail.com">@gmail.com</option>
+              <option value="outlook.com">@outlook.com</option>
+              <option value="icloud.com">@icloud.com</option>
+              <option value="proton.me">@proton.me</option>
+            </select>
+          </div>
+
+          <div class="buttons">
+            <button class="btn" id="genEmailBtn">Generate Email</button>
+            <button class="btn btnGhost" id="copyEmailBtn">Copy</button>
           </div>
         </div>
-      </section>
-    </main>
-  </section>
+      </div>
 
-  <script src="js/app.js"></script>
-  <script type="module" src="js/ui.js"></script>
+      <div class="card">
+        <div class="cardBody">
+          <div class="historyHeader">
+            <h3 class="cardTitle" style="margin:0;">Recent History</h3>
+            <button id="clearHistoryBtn" class="btnGhost" style="padding:4px 8px; font-size:10px;">Clear</button>
+          </div>
+          <div id="historyList" class="history">
+            <div class="smallText">No history yet.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="pmSection" class="pm">
+      <div id="pm-lock">
+        <h2>Vault Locked</h2>
+        <input type="password" id="masterPassword" placeholder="Enter Master Password..." />
+        <button id="unlockPM">Unlock Vault</button>
+      </div>
+
+      <div id="pm-app" hidden>
+        <h2>Your Vault</h2>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="cardBody">
+            <input type="text" id="pm-title" placeholder="Title (e.g. GitHub)" />
+            <input type="text" id="pm-login" placeholder="Login / Email" />
+            <input type="password" id="pm-password" placeholder="Password" />
+            <button id="pm-save" class="btn">Encrypt & Save</button>
+          </div>
+        </div>
+        <ul id="pm-list"></ul>
+      </div>
+    </div>
+    
+    <div style="text-align:center; padding:40px; opacity:0.4; font-size:12px;">
+      PGen.xyz Demo Project
+    </div>
+  </div>
+
+  <script type="module" src="./js/ui.js"></script>
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
