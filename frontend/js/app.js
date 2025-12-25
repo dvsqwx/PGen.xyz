@@ -1,5 +1,5 @@
 const API_BASE = "http://localhost:5050";
-const API_KEY = "pgen_demo_key_123"; // must match backend .env (API_KEY)
+const API_KEY = "pgen_demo_key_123";
 const HISTORY_KEY = "pgen_history_v1";
 const HISTORY_LIMIT = 10;
 
@@ -25,6 +25,7 @@ const scoreText = document.getElementById("scoreText");
 const progressBar = document.getElementById("progressBar");
 const checksEl = document.getElementById("checks");
 const tipsEl = document.getElementById("tips");
+
 
 let msgTimer = null;
 
@@ -57,13 +58,22 @@ function estimatePoolSize(opts) {
   if (opts.lower) pool += 26;
   if (opts.upper) pool += 26;
   if (opts.digits) pool += 10;
-  if (opts.symbols) pool += 32; // rough typical printable symbols count
+  if (opts.symbols) pool += 32;
   return pool;
 }
 
 function entropyBits(length, poolSize) {
   if (length <= 0 || poolSize <= 1) return 0;
   return Math.log2(Math.pow(poolSize, length));
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 async function api(path, options = {}) {
@@ -82,11 +92,11 @@ async function api(path, options = {}) {
 async function tryLoadSettingsFromServer() {
   try {
     const s = await api("/api/settings");
-    lengthInput.value = s.length;
-    lowerCheckbox.checked = !!s.lower;
-    upperCheckbox.checked = !!s.upper;
-    digitsCheckbox.checked = !!s.digits;
-    symbolsCheckbox.checked = !!s.symbols;
+    if(lengthInput) lengthInput.value = s.length;
+    if(lowerCheckbox) lowerCheckbox.checked = !!s.lower;
+    if(upperCheckbox) upperCheckbox.checked = !!s.upper;
+    if(digitsCheckbox) digitsCheckbox.checked = !!s.digits;
+    if(symbolsCheckbox) symbolsCheckbox.checked = !!s.symbols;
   } catch {
   }
 }
@@ -103,8 +113,7 @@ async function pushSettingsToServer() {
         symbols: symbolsCheckbox.checked
       })
     });
-  } catch {
-  }
+  } catch { }
 }
 
 function loadHistoryLocal() {
@@ -120,8 +129,7 @@ function loadHistoryLocal() {
 function saveHistoryLocal(arr) {
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, HISTORY_LIMIT)));
-  } catch {
-  }
+  } catch { }
 }
 
 function addToHistoryLocal(pw) {
@@ -133,8 +141,7 @@ function addToHistoryLocal(pw) {
 function clearHistoryLocal() {
   try {
     localStorage.removeItem(HISTORY_KEY);
-  } catch {
-  }
+  } catch { }
 }
 
 async function getHistory() {
@@ -166,6 +173,7 @@ async function clearHistoryAll() {
   }
 }
 
+
 function buildAlphabet() {
   const lower = "abcdefghijklmnopqrstuvwxyz";
   const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -173,10 +181,10 @@ function buildAlphabet() {
   const symbols = "!@#$%^&*()-_=+[]{};:,.<>?/~|";
 
   let pool = "";
-  if (lowerCheckbox.checked) pool += lower;
-  if (upperCheckbox.checked) pool += upper;
-  if (digitsCheckbox.checked) pool += digits;
-  if (symbolsCheckbox.checked) pool += symbols;
+  if (lowerCheckbox?.checked) pool += lower;
+  if (upperCheckbox?.checked) pool += upper;
+  if (digitsCheckbox?.checked) pool += digits;
+  if (symbolsCheckbox?.checked) pool += symbols;
   return pool;
 }
 
@@ -190,10 +198,10 @@ function generatePassword(len) {
   if (!pool.length) return "";
 
   const required = [];
-  if (lowerCheckbox.checked) required.push("abcdefghijklmnopqrstuvwxyz");
-  if (upperCheckbox.checked) required.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-  if (digitsCheckbox.checked) required.push("0123456789");
-  if (symbolsCheckbox.checked) required.push("!@#$%^&*()-_=+[]{};:,.<>?/~|");
+  if (lowerCheckbox?.checked) required.push("abcdefghijklmnopqrstuvwxyz");
+  if (upperCheckbox?.checked) required.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  if (digitsCheckbox?.checked) required.push("0123456789");
+  if (symbolsCheckbox?.checked) required.push("!@#$%^&*()-_=+[]{};:,.<>?/~|");
 
   const chars = [];
 
@@ -231,10 +239,9 @@ function analyzePassword(pw) {
   if (length >= 16) score += 10;
 
   const variety = [checks.lower, checks.upper, checks.digits, checks.symbols].filter(Boolean).length;
-  score += variety * 10; // up to 40
+  score += variety * 10;
 
   if (!checks.noRepeatHeavy && length >= 8) score -= 10;
-
   score = clamp(score, 0, 100);
 
   let label = "Very weak";
@@ -249,7 +256,7 @@ function analyzePassword(pw) {
   if (!checks.upper) tips.push("Add uppercase letters (A–Z).");
   if (!checks.digits) tips.push("Add digits (0–9).");
   if (!checks.symbols) tips.push("Add symbols (!@#...).");
-  if (!checks.noRepeatHeavy) tips.push("Avoid repeating the same characters too much.");
+  if (!checks.noRepeatHeavy) tips.push("Avoid repeating chars.");
 
   const guessed = {
     lower: checks.lower,
@@ -272,32 +279,22 @@ function renderChecks(checks) {
     { ok: checks.upper, text: "Has uppercase" },
     { ok: checks.digits, text: "Has digits" },
     { ok: checks.symbols, text: "Has symbols" },
-    { ok: checks.noRepeatHeavy, text: "Not too repetitive" }
+    { ok: checks.noRepeatHeavy, text: "No repetition" }
   ];
 
   checksEl.innerHTML = rows.map(r => {
-    const cls = r.ok ? "ok" : "bad";
+    const cls = r.ok ? "ok" : "bad"; // Ensure CSS has .ok / .bad or adapt
     const mark = r.ok ? "✓" : "—";
-    return `<div class="${cls}">${mark} ${r.text}</div>`;
+    const color = r.ok ? "#b9ff2a" : "rgba(255,255,255,0.3)";
+    return `<div style="color:${color}">${mark} ${r.text}</div>`;
   }).join("");
 }
 
 function renderTips(tips, entropy) {
   if (!tipsEl) return;
-
   const list = tips.slice();
-  list.unshift(`Estimated entropy: ~${Math.round(entropy)} bits`);
-
+  list.unshift(`Entropy: ~${Math.round(entropy)} bits`);
   tipsEl.innerHTML = list.map(t => `<li>${escapeHtml(t)}</li>`).join("");
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
 
 function renderAnalysis(pw) {
@@ -316,7 +313,7 @@ async function renderHistory() {
   const items = await getHistory();
 
   if (!items.length) {
-    historyList.innerHTML = `<div class="smallText">No saved passwords yet.</div>`;
+    historyList.innerHTML = `<div class="smallText" style="padding:10px;">No saved passwords yet.</div>`;
     return;
   }
 
@@ -324,7 +321,7 @@ async function renderHistory() {
     const safe = escapeHtml(pw);
     return `
       <div class="historyItem">
-        <div class="mono">${safe}</div>
+        <div class="mono">${safe.substring(0, 16)}${safe.length>16?"...":""}</div>
         <div class="row" style="gap:8px;">
           <button class="btn btnGhost histUse" type="button" data-pw="${safe}">Use</button>
           <button class="btn btnGhost histCopy" type="button" data-pw="${safe}">Copy</button>
@@ -336,7 +333,7 @@ async function renderHistory() {
   historyList.querySelectorAll(".histUse").forEach((btn) => {
     btn.addEventListener("click", () => {
       const pw = btn.getAttribute("data-pw") || "";
-      passwordInput.value = pw;
+      if(passwordInput) passwordInput.value = pw;
       renderAnalysis(pw);
       setMessage("Loaded from history.");
     });
@@ -349,25 +346,25 @@ async function renderHistory() {
         await navigator.clipboard.writeText(pw);
         setMessage("Copied.");
       } catch {
-        setMessage("Copy failed (browser blocked).");
+        setMessage("Copy failed.");
       }
     });
   });
 }
 
 function getLen() {
-  const n = parseInt(lengthInput.value, 10);
+  const n = parseInt(lengthInput?.value, 10);
   return clamp(Number.isFinite(n) ? n : 12, 4, 64);
 }
+
 
 generateBtn?.addEventListener("click", () => {
   const len = getLen();
   const pool = buildAlphabet();
   if (!pool.length) {
-    setMessage("Select at least one character set.");
+    setMessage("Select at least one option.");
     return;
   }
-
   const pw = generatePassword(len);
   passwordInput.value = pw;
   renderAnalysis(pw);
@@ -390,7 +387,7 @@ copyBtn?.addEventListener("click", async () => {
     await navigator.clipboard.writeText(pw);
     setMessage("Copied to clipboard.");
   } catch {
-    setMessage("Copy failed (browser blocked).");
+    setMessage("Copy failed.");
   }
 });
 
@@ -400,11 +397,9 @@ saveBtn?.addEventListener("click", async () => {
     setMessage("Nothing to save.");
     return;
   }
-
   const savedToServer = await addHistory(pw);
   await renderHistory();
-
-  setMessage(savedToServer ? "Saved to server history." : "Saved locally (server offline).");
+  setMessage(savedToServer ? "Saved to server." : "Saved locally.");
 });
 
 clearHistoryBtn?.addEventListener("click", async () => {
@@ -419,14 +414,70 @@ passwordInput?.addEventListener("input", () => {
 
 [lengthInput, lowerCheckbox, upperCheckbox, digitsCheckbox, symbolsCheckbox].forEach((el) => {
   el?.addEventListener("change", () => {
-    // keep length sane
     if (el === lengthInput) lengthInput.value = String(getLen());
     pushSettingsToServer();
   });
 });
 
+
+const emailInput = document.getElementById("emailInput");
+const domainSelect = document.getElementById("domainSelect");
+const genEmailBtn = document.getElementById("genEmailBtn");
+const copyEmailBtn = document.getElementById("copyEmailBtn");
+
+const commonDomains = [
+  "gmail.com", 
+  "yahoo.com", 
+  "outlook.com", 
+  "proton.me", 
+  "icloud.com", 
+  "yandex.ru"
+];
+
+function generateMailLogin(len = 10) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  // First char always letter
+  result += letters.charAt(Math.floor(Math.random() * letters.length));
+  
+  for (let i = 1; i < len; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+if (genEmailBtn) {
+  genEmailBtn.addEventListener("click", () => {
+    const randomLen = Math.floor(Math.random() * 5) + 8; // 8-12 chars
+    const login = generateMailLogin(randomLen);
+    
+    let domain = domainSelect.value;
+    if (domain === "random") {
+      domain = commonDomains[Math.floor(Math.random() * commonDomains.length)];
+    }
+
+    const email = `${login}@${domain}`;
+    if (emailInput) emailInput.value = email;
+    setMessage("Email generated.");
+  });
+}
+
+if (copyEmailBtn) {
+  copyEmailBtn.addEventListener("click", async () => {
+    const txt = emailInput?.value;
+    if (!txt) return;
+    try {
+      await navigator.clipboard.writeText(txt);
+      setMessage("Email copied.");
+    } catch {
+      setMessage("Copy failed.");
+    }
+  });
+}
+
 (async () => {
   renderAnalysis(passwordInput?.value || "");
-  await tryLoadSettingsFromServer();     // optional
-  await renderHistory();                 // server first, fallback local
+  await tryLoadSettingsFromServer();
+  await renderHistory();
 })();
